@@ -1,0 +1,264 @@
+body {
+  margin: 0;
+  padding: 0;
+  background-image: url("/static/img/back-img.jpg");
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  height: 200px;
+}
+header {
+  width: 100%;
+  background-size: cover;
+  background-position: center;
+}
+.content {
+  color: #fff;
+  width: 100%;
+  height: 300px;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+ul {
+  float: right;
+  margin-right: 100px;
+  list-style-type: none;
+  margin-top: 30px;
+}
+ul li {
+  display: inline-block;
+}
+ul li a {
+  text-decoration: none;
+  color: #fff;
+  padding: 15px 45px;
+  border: none;
+  transition: 0.6;
+  font-size: 20px;
+  display: block;
+}
+ul li a:hover {
+  color: #fff;
+  text-decoration: underline;
+}
+ul li .active a {
+  color: #000;
+}
+.logo {
+  font-family: Freestyle Script;
+  font-size: 50px;
+  text-decoration: underline;
+  color: #fff;
+  padding: 15px 45px;
+  margin-top: 30px;
+  margin-left: 200px;
+  float: left;
+  height: auto;
+}
+s .cover {
+  position: relative;
+  text-align: center;
+  color: white;
+}
+
+.centered {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.centered {
+  position: absolute;
+  top: 20%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: "Emblema One";
+  font-size: 70px;
+  color: white;
+  border: 9px;
+}
+
+.orderdiv {
+  background-color: orange;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.orderdiv h3 {
+  transform: translateY(20px);
+}
+
+.ordertable td {
+  color: black;
+}
+
+table.ordertable {
+  background-color: white;
+  width: 70%;
+  color: black;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.ordertable td:nth-child(2n-1) {
+  text-align: left;
+  padding-left: 150px;
+}
+.ordertable td:nth-child(2n) {
+  text-align: left;
+  padding-left: 100px;
+}
+
+.ordertable {
+  font-size: 15px;
+  font-weight: bold;
+}
+
+.ordertable #payment,
+#deliveryinfo {
+  display: table-column;
+}
+
+.ordertable h3 {
+  font-size: 25px;
+  color: rgb(77, 7, 28);
+  padding-top: 0px;
+}
+
+.form-text {
+  size: "50";
+}
+
+button {
+  background-color: rgb(255, 0, 55);
+  color: black;
+  font-weight: bold;
+  padding: 10px;
+  margin-left: 0px;
+  margin-bottom: 20px;
+}
+
+input[type="text"],
+input[type="email"] {
+  width: 90%;
+  padding: 5px 0;
+  border-color: black;
+}
+
+.ordertable #payment {
+  width: 85%;
+}
+.ordertable #deliveryinfo {
+  width: 85%;
+  margin-left: 0px;
+}
+.footer {
+  background-color: black;
+  color: #fff;
+}
+.pizza-list {
+  min-height: 80vh;
+  width: 100vw;
+  padding: 40px;
+  box-sizing: border-box;
+  background-color: transparent !important;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.pizza-item {
+  min-width: 47%;
+  background: url(/static/img/image.jpg);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  color: white;
+  position: relative;
+  border-radius: 20px;
+}
+
+.pizza-item-div {
+  width: 100%;
+  height: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+  backdrop-filter: blur(5px);
+  border-radius: 20px;
+}
+
+.pizza-item p,
+.pizza-item button {
+  font-style: italic;
+  font-weight: bolder;
+}
+
+.pizza-item a {
+  text-decoration: none;
+  color: #fff;
+  border: none;
+  transition: 0.6;
+  font-size: 20px;
+  display: block;
+  transition: all 0.5s;
+}
+.pizza-item a:hover {
+  transform: scale(1.1);
+  transition: all 0.5s;
+}
+
+.admin-header {
+  width: 100%;
+  height: 300px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  background-image: url("/static/img/image1.jpg");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  background-attachment: fixed;
+  color: white;
+  font-weight: bolder;
+  font-style: italic;
+}
+.admin-login {
+  background-image: url("/static/img/image1.jpg");
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  width: 600px;
+  /* height: 600px; */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  border-radius: 20px;
+  color: white;
+  font-weight: bolder;
+  font-style: italic;
+}
+.admin-login-div {
+  width: 100%;
+  height: 100%;
+  border-radius: 20px;
+  padding: 30px;
+  box-sizing: border-box;
+  backdrop-filter: blur(5px);
+}
+.admin-login form {
+  width: 100%;
+}
+.admin-dashboard {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}

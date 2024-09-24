@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Home - Bruno Pizzeria</title>
+    <link href="/static/css/style.css" rel="stylesheet" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+      crossorigin="anonymous"
+    />
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
+      integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://kit.fontawesome.com/f95273cb32.js"
+      crossorigin="anonymous"
+    ></script>
+  </head>
+  <body>
+    <header>
+      <div class="main">
+        <div class="slider">
+          <div class="load"></div>
+          <div class="content">
+            <a href="/" class="logo">Bruno's Pizzeria</a>
+            <ul>
+              <li class="active">
+                <a href="/order"><b>Order now</b></a>
+              </li>
+              <li>
+                <a href="/admin"><b>Admin</b></a>
+              </li>
+              <li>
+                <a href="#"><b>Features</b> </a>
+              </li>
+            </ul>
+          </div>
+          <div class="title">
+            <h1>Welcome To Bruno's Pizzeria</h1>
+            <p>Order a delicious Pizza today</p>
+          </div>
+        </div>
+      </div>
+    </header>
+    <div class="intro">
+      <div class="main">
+        <div class="heading">
+          <h3>Who We are</h3>
+          <p>
+            Bruno's Pizzeria was brought to Australia in the early 80s, by an
+            inspired young man named Bruno. Having scored the perfect location,
+            within the heart of Hawthorn, Bruno set out to bring his Italian
+            heritage to everyone's bellies.
+            <br />If you're looking for dinner, we can guarantee you'll have the
+            biggest smile and happiest belly after taking your first bite of our
+            delicious pizzas. <br />If you're looking for dine-in, we can
+            provide professional restaurant quality service, or if you're
+            looking to binge your favorite TV show on the couch, we can deliver
+            right to your door.
+          </p>
+        </div>
+      </div>
+      <img src="/static/img/chef-v.png" class="pic" alt="pic" />
+    </div>
+    <div class="menu">
+      <div class="info">
+        <div class="menu-bar">
+          <h3 class="topic">Our Menu</h3>
+          <div class="pizza-list" id="pizza-list">
+            <!-- Pizzas will be fetched from the backend and displayed here -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      fetch("/api/pizzas")
+        .then((response) => response.json())
+        .then((data) => {
+          const pizzaList = document.getElementById("pizza-list");
+          data.pizzas.forEach((pizza) => {
+            pizzaList.innerHTML += `
+                    <div class="pizza-item">
+                      <div class="pizza-item-div">
+                        <p class="topic2">${pizza.name}</p>
+                        <p class="topic3">$${pizza.price}</p>
+                        <p class="para">${pizza.description}</p>
+                        <a href="/order"><b>Order now</b></a>
+                      </div>
+                    </div>`;
+          });
+        })
+        .catch((error) => console.error("Error fetching pizzas:", error));
+
+      function addToCart(pizzaId) {
+        fetch("/api/addToCart", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ pizza_ids: [pizzaId] }),
+        })
+          .then((response) => {
+            if (response.ok) {
+              return response.json();
+            }
+            alert("Failed to add pizza to cart");
+            throw new Error("Failed to add pizza to cart");
+          })
+          .then((data) => {
+            console.log(data.message);
+            alert("Pizza added to cart");
+          })
+          .catch((error) => {
+            alert("Failed to add pizza to cart");
+            console.error("Error adding pizza to cart:", error);
+          });
+      }
+    </script>
+  </body>
+</html>

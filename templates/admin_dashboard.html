@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" type="text/css" href="/static/css/order-style.css" />
+  </head>
+  <body style="background-image: none">
+    <div>
+      <div class="admin-header">
+        <h1 class="text-center">Admin Dashboard</h1>
+        <div class="d-flex justify-content-end gap-5">
+          <button
+            class="btn btn-primary mt-5"
+            onclick="window.location.href = '/'"
+          >
+            Home
+          </button>
+          <button type="button" class="btn btn-danger mt-5" id="logout-btn">
+            Logout
+          </button>
+        </div>
+      </div>
+
+      <div class="admin-dashboard">
+        <!-- Authentication Form -->
+        <div id="auth-section" class="m-5 admin-login">
+          <div class="admin-login-div">
+            <h3>Login</h3>
+            <form id="auth-form">
+              <div class="mb-3">
+                <label for="adminId" class="form-label">Admin ID</label>
+                <input type="text" id="adminId" class="form-control" required />
+              </div>
+              <div class="mb-3">
+                <label for="adminPassword" class="form-label">Password</label>
+                <input
+                  type="password"
+                  id="adminPassword"
+                  class="form-control"
+                  required
+                />
+              </div>
+              <button type="submit" class="btn btn-primary">Login</button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Pizza List -->
+        <div id="pizza-list" class="m-5" style="display: none">
+          <h3>All Pizzas</h3>
+          <div class="row" id="pizzas"></div>
+        </div>
+
+        <!-- Add Pizza Form -->
+        <div
+          class="m-5"
+          id="add-pizza-section"
+          style="display: none; width: 80%"
+        >
+          <h3>Add New Pizza</h3>
+          <form id="add-pizza-form">
+            <div class="mb-3">
+              <label for="pizzaName" class="form-label">Pizza Name</label>
+              <input type="text" id="pizzaName" class="form-control" required />
+            </div>
+            <div class="mb-3">
+              <label for="pizzaDescription" class="form-label"
+                >Description</label
+              >
+              <input
+                type="text"
+                id="pizzaDescription"
+                class="form-control"
+                required
+              />
+            </div>
+            <div class="mb-3">
+              <label for="pizzaPrice" class="form-label">Price</label>
+              <input
+                type="number"
+                id="pizzaPrice"
+                class="form-control"
+                required
+              />
+            </div>
+            <button type="submit" class="btn btn-success">Add Pizza</button>
+          </form>
+        </div>
+
+        <!-- Add Rider Form -->
+        <div
+          class="m-5"
+          id="add-rider-section"
+          style="display: none; width: 80%"
+        >
+          <h3>Add New Rider</h3>
+          <form id="add-rider-form">
+            <div class="mb-3">
+              <label for="riderName" class="form-label">Rider Name</label>
+              <input type="text" id="riderName" class="form-control" required />
+            </div>
+            <button type="submit" class="btn btn-success">Add Rider</button>
+          </form>
+        </div>
+
+        <!-- Orders List -->
+        <div class="container m-5">
+          <h1 id="order-list-label" style="display: none">Orders List</h1>
+          <div class="row" id="order-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const ridersMap = {};
+
+      // Check for session on page load
+      window.onload = function () {
+        fetch("/api/session")
+          .then((response) => {
+            if (response.ok) {
+              // Session exists, fetch data directly
+              document.getElementById("auth-section").style.display = "none";
+              document.getElementById("add-pizza-section").style.display =
+                "block";
+              document.getElementById("add-rider-section").style.display =
+                "block";
+              document.getElementById("pizza-list").style.display = "block";
+              document.getElementById("order-list-label").style.display =
+                "block";
+
+              fetchPizzas();
+              fetchRiders();
+              fetchOrders();
+            } else {
+              // No session, show login form
+              document.getElementById("auth-section").style.display = "block";
+            }
+          })
+          .catch((error) => console.error("Error checking session:", error));
+      };
+
+      // Fetch and display all pizzas
+      function fetchPizzas() {
+        fetch("/api/pizzas")
+          .then((response) => response.json())
+          .then((data) => {
+            const pizzasContainer = document.getElementById("pizzas");
+            pizzasContainer.innerHTML = ""; // Clear existing pizzas
+            data.pizzas.forEach((pizza) => {
+              pizzasContainer.innerHTML += `
+                            <div class="col-md-4">
+                                <div class="card mb-4">
+                                    <div class="card-body">
+                                        <h5 class="card-title">${pizza.name}</h5>
+                                        <p class="card-text">${pizza.description}</p>
+                                        <p class="card-text">$${pizza.price}</p>
+                                        <button class="btn btn-danger" onclick="removePizza('${pizza.id}')">Delete</button>
+                                    </div>
+                                </div>
+                            </div>`;
+            });
+          })
+          .catch((error) => console.error("Error fetching pizzas:", error));
+      }
+
+      // Fetch and display all riders
+      function fetchRiders() {
+        fetch("/api/riders")
+          .then((response) => response.json())
+          .then((data) => {
+            data.riders.forEach((rider) => {
+              ridersMap[rider.name] = rider.id; // Map rider names to IDs
+            });
+          })
+          .catch((error) => console.error("Error fetching riders:", error));
+      }
+
+      // Fetch and display all orders
+      function fetchOrders() {
+        fetch("/api/orders")
+          .then((response) => response.json())
+          .then((data) => {
+            const orderList = document.getElementById("order-list");
+            orderList.innerHTML = ""; // Clear existing orders
+            if (data.orders && data.orders.length > 0) {
+              data.orders.forEach((order) => {
+                const riderAssigned = order.rider_name;
+                orderList.innerHTML += `
+                                <div class="col-md-4">
+                                    <div class="card mb-4">
+                                        <div class="card-body">
+                                            <h5 class="card-title">Order Total: $${
+                                              order.total
+                                            }</h5>
+                                            <ul class="list-group">
+                                                ${order.pizzas
+                                                  .map(
+                                                    (pizza) => `
+                                                    <li class="list-group-item">
+                                                        ${pizza.name} - $${pizza.price}
+                                                    </li>`
+                                                  )
+                                                  .join("")}
+                                            </ul>
+                                            ${
+                                              riderAssigned
+                                                ? `<p>Assigned Rider: ${riderAssigned?.name}</p>`
+                                                : `<div class="mb-3">
+                                                    <label for="rider-select-${
+                                                      order.id
+                                                    }" class="form-label">Assign Rider</label>
+                                                    <select id="rider-select-${
+                                                      order.id
+                                                    }" class="form-select">
+                                                        <option value="">Select Rider</option>
+                                                        ${Object.keys(ridersMap)
+                                                          .map(
+                                                            (rider) =>
+                                                              `<option value="${rider}">${rider}</option>`
+                                                          )
+                                                          .join("")}
+                                                    </select>
+                                                </div>
+                                                <button class="btn btn-primary" onclick="assignOrder('${
+                                                  order.id
+                                                }')">Assign Order</button>`
+                                            }
+                                        </div>
+                                    </div>
+                                </div>`;
+              });
+            } else {
+              orderList.innerHTML = `<p>No orders found!</p>`;
+            }
+          })
+          .catch((error) => console.error("Error fetching orders:", error));
+      }
+
+      // Handle authentication form submission
+      document
+        .getElementById("auth-form")
+        .addEventListener("submit", function (event) {
+          event.preventDefault();
+          const adminId = document.getElementById("adminId").value;
+          const adminPassword = document.getElementById("adminPassword").value;
+
+          fetch("/api/login", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              username: adminId,
+              password: adminPassword,
+            }),
+          })
+            .then((response) => {
+              if (response.status === 200) {
+                // Hide login section and show admin dashboard
+                document.getElementById("auth-section").style.display = "none";
+                document.getElementById("add-pizza-section").style.display =
+                  "block";
+                document.getElementById("add-rider-section").style.display =
+                  "block";
+                document.getElementById("pizza-list").style.display = "block";
+                document.getElementById("order-list-label").style.display =
+                  "block";
+
+                fetchPizzas(); // Fetch pizzas after successful login
+                fetchRiders(); // Fetch riders after successful login
+                fetchOrders(); // Fetch orders after successful login
+              } else if (response.status === 403) {
+                alert("Invalid ID or Password");
+              } else {
+                alert("An unknown error occurred");
+              }
+            })
+            .catch((error) => {
+              console.error("Error logging in:", error);
+              alert("An error occurred during login.");
+            });
+        });
+
+      // Handle logout button click
+      document
+        .getElementById("logout-btn")
+        .addEventListener("click", function () {
+          fetch("/api/logout").then((response) => {
+            if (response.ok) {
+              // Successful logout, show login form
+              document.getElementById("auth-section").style.display = "block";
+              document.getElementById("add-pizza-section").style.display =
+                "none";
+              document.getElementById("add-rider-section").style.display =
+                "none";
+              document.getElementById("pizza-list").style.display = "none";
+              document.getElementById("order-list-label").style.display =
+                "none";
+            } else {
+            }
+          });
+        });
+
+      // Handle add pizza form submission
+      document
+        .getElementById("add-pizza-form")
+        .addEventListener("submit", function (event) {
+          event.preventDefault();
+          const pizzaName = document.getElementById("pizzaName").value;
+          const pizzaDescription =
+            document.getElementById("pizzaDescription").value;
+          const pizzaPrice = parseFloat(
+            document.getElementById("pizzaPrice").value
+          );
+
+          fetch("/api/addPizza", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              name: pizzaName,
+              description: pizzaDescription,
+              price: pizzaPrice,
+            }),
+          })
+            .then((response) => {
+              if (!response.ok) {
+                throw new Error("Failed to add pizza");
+              }
+              return response.json();
+            })
+            .then((data) => {
+              alert("Pizza added successfully!");
+              document.getElementById("add-pizza-form").reset(); // Reset form
+              fetchPizzas(); // Refresh pizza list
+            })
+            .catch((error) => console.error("Error adding pizza:", error));
+        });
+
+      // Handle add rider form submission
+      document
+        .getElementById("add-rider-form")
+        .addEventListener("submit", function (event) {
+          event.preventDefault();
+          const riderName = document.getElementById("riderName").value;
+
+          fetch("/api/addRider", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              name: riderName,
+            }),
+          })
+            .then((response) => {
+              if (!response.ok) {
+                throw new Error("Failed to add rider");
+              }
+              return response.json();
+            })
+            .then((data) => {
+              alert("Rider added successfully!");
+              document.getElementById("add-rider-form").reset(); // Reset form
+              fetchRiders(); // Refresh rider list
+              location.reload();
+            })
+            .catch((error) => console.error("Error adding rider:", error));
+        });
+
+      // Remove pizza
+      function removePizza(pizzaId) {
+        fetch("/api/removePizza", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ pizza_id: pizzaId }),
+        })
+          .then((response) => {
+            if (response.ok) {
+              alert("Pizza removed successfully!");
+              fetchPizzas(); // Refresh pizza list
+            } else {
+              alert("Failed to remove pizza");
+            }
+          })
+          .catch((error) => console.error("Error removing pizza:", error));
+      }
+
+      // Assign order to rider
+      function assignOrder(orderId) {
+        const riderName = document.getElementById(
+          `rider-select-${orderId}`
+        ).value;
+        if (!riderName) {
+          alert("Please select a rider.");
+          return;
+        }
+
+        fetch("/api/assignOrder", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ order_id: orderId, rider_name: riderName }),
+        })
+          .then((response) => {
+            if (response.ok) {
+              alert("Order assigned successfully!");
+              fetchOrders(); // Refresh orders list to show the assigned rider
+            } else {
+              alert("Failed to assign order.");
+            }
+          })
+          .catch((error) => console.error("Error assigning order:", error));
+      }
+    </script>
+  </body>
+</html>
